@@ -8,14 +8,14 @@ before_install:
 
 env:
   matrix:
-    - TOOLCHAIN=stable
-    - TOOLCHAIN=beta
-    - TOOLCHAIN=nightly
+    - CHANNEL=stable
+    - CHANNEL=beta
+    - CHANNEL=nightly
 
 script:
   - docker build . \
-      --env TOOLCHAIN=${TOOLCHAIN} \
-      --tag aetheric/rust:${TOOLCHAIN}
+      --build-arg CHANNEL=${CHANNEL} \
+      --tag aetheric/rust:${CHANNEL}
 
 before_deploy:
   - docker login \

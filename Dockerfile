@@ -19,10 +19,10 @@ HEALTHCHECK --interval=5m --timeout=3s \
 RUN apk --no-cache add --virtual .build-dependencies \
 		curl
 
-ENV TOOLCHAIN nightly
+ARG CHANNEL
 
 # Install rustup with needed arguments
-RUN curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain $TOOLCHAIN \
+RUN curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain $CHANNEL \
 		&& RUN rustup component add rust-src
 
 # clean up build dependencies
