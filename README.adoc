@@ -1,5 +1,7 @@
 = Docker: Rust
 
+image:https://travis-ci.org/aetheric/docker-rust.svg?branch=master["Build Status", link="https://travis-ci.org/aetheric/docker-rust"]
+
 A development environment for rust that projects can use as a base.
 
 == Usage
