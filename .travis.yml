@@ -13,7 +13,7 @@ env:
     - CHANNEL=nightly
 
 script:
-  - docker build --build-arg CHANNEL=${CHANNEL} --tag aetheric/rust:${CHANNEL} .
+  - ./build.sh ${CHANNEL}
 
 before_deploy:
   - docker login \

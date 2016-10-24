@@ -8,19 +8,19 @@ RUN apk --no-cache add --virtual .build-dependencies \
 		curl
 
 # Download the rustup installer script and make it runnable
-RUN curl --output installer.sh https://sh.rustup.rs \
-		&& chmod +x ./installer.sh
+RUN curl --output ~/installer.sh https://sh.rustup.rs \
+		&& chmod +x ~/installer.sh
 
 # This should be either stable, beta, or nightly
 ARG CHANNEL
 
 # Install rustup with needed channel and sources
-RUN ./installer.sh -y --default-toolchain $CHANNEL \
+RUN ~/installer.sh -y --default-toolchain $CHANNEL \
 		&& rustup component add rust-src
 
 # clean up build dependencies
 RUN apk del .build-dependencies \
-		&& rm -f ./installer.sh
+		&& rm -f ~/installer.sh
 
 # Make sure the work dir is created and accessible.
 WORKDIR /usr/src/app
