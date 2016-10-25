@@ -13,8 +13,8 @@ env:
     - CHANNEL=nightly
 
 script:
-  - chmod +x ./build.sh \
-      && ./build.sh ${CHANNEL}
+  - chmod +x ./build.sh
+  - ./build.sh ${CHANNEL}
 
 before_deploy:
   - docker login \
@@ -22,7 +22,7 @@ before_deploy:
       --password ${DOCKER_PASSWORD}
 
 deploy:
-  
+
   - provider: script
     script: docker push aetheric/rust
     skip_cleanup: true
