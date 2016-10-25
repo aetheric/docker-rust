@@ -11,10 +11,11 @@ RUN apk --no-cache add --virtual .build-dependencies \
 
 # This should be either stable, beta, or nightly
 ARG RUST_CHANNEL
+ARG RUST_VERSION=${RUST_CHANNEL}
 
 ARG RUST_DIST_URL=https://static.rust-lang.org/dist
 ARG RUST_NAME_SUFFIX=x86_64-unknown-linux-gnu
-ARG RUST_NAME_BIN=rust-${RUST_CHANNEL}-${RUST_NAME_SUFFIX}
+ARG RUST_NAME_BIN=rust-${RUST_VERSION}-${RUST_NAME_SUFFIX}
 ARG RUST_NAME_SRC=rustc-${RUST_CHANNEL}-src
 ARG RUST_NAME_INT=rust-std-${RUST_NAME_SUFFIX}
 
