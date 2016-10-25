@@ -27,8 +27,9 @@ RUN apk del .build-dependencies
 +
 [source,shell]
 ----
-docker build . \
-	--tag reponame/projectname
+docker build \
+	--tag reponame/projectname \
+	.
 ----
 
 . And finally, get to running docker commands:
@@ -36,7 +37,8 @@ docker build . \
 [source,shell]
 ----
 docker run reponame/projectname \
-	--volume .:/usr/src/app \
+	--volume .:/usr/work \
+	--interactive \
 	--tty \
 	watch
 ----
