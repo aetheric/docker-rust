@@ -7,30 +7,39 @@ A development environment for rust that projects can use as a base.
 == Usage
 
 . Just make a `Dockerfile` in your project like this:
++
+[source,docker]
+----
+FROM aetheric/rust:stable
 
-	FROM aetheric/rust:stable
+# Add needed alpine packages
+RUN apk --no-cache add --virtual .build-dependencies \
+	gcc
 
-	# Add needed alpine packages
-	RUN apk --no-cache add --virtual .build-dependencies \
-		glibc
+# Install whatever binaries you need
+RUN cargo install cargo-watch
 
-	# Install whatever binaries you need
-	RUN cargo install cargo-watch
-
-	# Make sure to clean up your apk additions.
-	RUN apk del .build-dependencies
+# Make sure to clean up your apk additions.
+RUN apk del .build-dependencies
+----
 
 . Then call the following command to run a build:
-
-	docker build . \
-		--tag reponame/projectname
++
+[source,shell]
+----
+docker build . \
+	--tag reponame/projectname
+----
 
 . And finally, get to running docker commands:
-
-	docker run reponame/projectname \
-		--volume .:/usr/src/app \
-		--tty \
-		watch
++
+[source,shell]
+----
+docker run reponame/projectname \
+	--volume .:/usr/src/app \
+	--tty \
+	watch
+----
 
 It's a good idea to put that last one in a script so commands can be run against the project a lot easier. Alternately, you can run it with the `--interactive` flag to just keep running commands.
 

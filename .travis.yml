@@ -13,7 +13,8 @@ env:
     - CHANNEL=nightly
 
 script:
-  - ./build.sh ${CHANNEL}
+  - chmod +x ./build.sh \
+      && ./build.sh ${CHANNEL}
 
 before_deploy:
   - docker login \
