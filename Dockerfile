@@ -21,7 +21,7 @@ ARG RUST_NAME_INT=rust-std-${RUST_NAME_SUFFIX}
 
 WORKDIR ~
 
-# Download, verify, unpack, remove, position, and install the channel.
+# Download, verify, unpack, remove,and position the channel.
 RUN pwd \
 	&& curl -fO ${RUST_DIST_URL}/${RUST_NAME_BIN}.tar.gz \
 	&& curl -fO ${RUST_DIST_URL}/${RUST_NAME_SRC}.tar.gz \
@@ -32,8 +32,13 @@ RUN pwd \
 	&& rm -f ${RUST_NAME_BIN}.tar.gz \
 	&& rm -f ${RUST_NAME_SRC}.tar.gz \
 	&& mv ${RUST_NAME_BIN}/ /rust \
-	&& mv rustc-${RUST_CHANNEL}/ /rust/${RUST_NAME_INT}/lib/rustlib/${RUST_NAME_SUFFIX}/src \
-	&& /rust/install.sh
+	&& mv rustc-${RUST_CHANNEL}/ /rust/${RUST_NAME_INT}/lib/rustlib/${RUST_NAME_SUFFIX}/src
+
+# Install the channel and put the binary on the path.
+RUN pwd \
+	&& /rust/install.sh --verbose \
+	&& chmod +x /rust/cargo \
+	&& ln -s /rust/cargo /usr/local/bin/
 
 # clean up build dependencies
 RUN apk del .build-dependencies
