@@ -27,7 +27,7 @@ before_script:
   - docker login
       --username ${DOCKER_USERNAME}
       --password ${DOCKER_PASSWORD}
-      docker.io
+      https://index.docker.io/v1/
 
 script:
   - docker push aetheric/rust:${CHANNEL}
