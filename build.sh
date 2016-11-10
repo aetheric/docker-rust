@@ -36,5 +36,6 @@ packer build \
 	-var "no_proxy=${no_proxy}" \
 	-var "CHANNEL=${CHANNEL}" \
 	-var-file=build-env.json \
+	-color=false \
 	packer.json
 

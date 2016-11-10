@@ -3,28 +3,29 @@ sudo: required
 services:
   - docker
 
-before_install:
-  - docker pull alpine:latest
-
 env:
+
+  global:
+    secure:
+
   matrix:
     - CHANNEL=stable
     - CHANNEL=beta
     - CHANNEL=nightly
 
-script:
+before_install:
+  - docker pull alpine:latest
+  - gem install glorious
   - chmod +x ./build.sh
+
+install:
   - ./build.sh ${CHANNEL}
 
-before_deploy:
+before_script:
   - docker login \
       --username ${DOCKER_USERNAME} \
       --password ${DOCKER_PASSWORD}
 
-deploy:
+script:
+  - docker push aetheric/rust:${CHANNEL}
 
-  - provider: script
-    script: docker push aetheric/rust
-    skip_cleanup: true
-    on:
-      branch: master

@@ -10,86 +10,83 @@ variables:
   # This should be either stable, beta, or nightly
   CHANNEL: null
 
-  # Not really necessary for most purposes
-  VERSION: '{{ user `CHANNEL` }}'
-
-  # Where all the rust artifacts are being hosted
-  DIST_URL: 'https://static.rust-lang.org/dist'
-
-  # This just gets stuck on the end of binary distributions
-  NAME_SUFFIX: 'x86_64-unknown-linux-gnu'
-
-  # The naming conventions for the tar archives and folders
-  NAME_BIN: 'rust-{{ user `VERSION` }}-{{ user `NAME_SUFFIX` }}'
-  NAME_SRC: 'rustc-{{ user `CHANNEL` }}-src'
-
-  # The odd name used internally for a couple of things
-  NAME_INT: 'rust-std-{{ user `NAME_SUFFIX` }}'
-
-  # This is where the rust sources need to be unpacked
-  DIR_LIBS: '/rust/{{ user `NAME_INT` }}/lib/rustlib/{{ user `NAME_SUFFIX` }}'
-
 builders:
   - type: docker
-    image: 'alpine:{{ user `ALPINE` }}'
+    image: "alpine:{{ user `ALPINE` }}"
     commit: true
+    run_command:
+      - '-d'
+      - '-i'
+      - '-t'
+      - '{{.Image}}'
+      - '/bin/sh'
 
 provisioners:
   - type: shell
+    #execute_command: "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     inline:
 
+      # Setting up needed variables
+      - "CHANNEL=\"{{ user `CHANNEL` }}\""
+
+      # Where all the rust artifacts are being hosted
+      - "DIST_URL=\"https://static.rust-lang.org/dist\""
+
+      # This just gets stuck on the end of binary distributions
+      - "NAME_SUFFIX=\"x86_64-unknown-linux-gnu\""
+
+      # The naming conventions for the tar archives and folders
+      - "NAME_BIN=\"rust-${CHANNEL}-${NAME_SUFFIX}\""
+      - "NAME_SRC=\"rustc-${CHANNEL}-src\""
+
+      # The odd name used internally for a couple of things
+      - "NAME_INT=\"rust-std-${NAME_SUFFIX}\""
+
+      # This is where the rust sources need to be unpacked
+      - "DIR_LIBS=\"/rust/${NAME_INT}/lib/rustlib/${NAME_SUFFIX}\""
+
       # Download all the development dependencies
-      - 'apk --no-cache add --virtual .build-dependencies
+      - "apk --no-cache add --virtual .build-dependencies
           ca-certificates
           curl
-          gcc'
+          gcc"
       
       # Download the rust binaries and verify them
-      - 'curl -fO {{ user `DIST_URL` }}/{{ user `NAME_BIN` }}.tar.gz'
-      - 'curl -fO {{ user `DIST_URL` }}/{{ user `NAME_BIN` }}.tar.gz.sha256
-            | sha256sum -c'
+      - "echo \"Attempting to download ${NAME_BIN} from ${DIST_URL}\"."
+      - "curl -fO ${DIST_URL}/${NAME_BIN}.tar.gz"
+      - "curl -fO ${DIST_URL}/${NAME_BIN}.tar.gz.sha256 | sha256sum -c"
       
       # Download all the rust sources
-      - 'curl -fO {{ user `DIST_URL` }}/{{ user `NAME_SRC` }}.tar.gz'
-      - 'curl -fO {{ user `DIST_URL` }}/{{ user `NAME_SRC` }}.tar.gz.sha256
-            | sha256sum -c'
+      - "echo 'Attempting to download ${NAME_SRC} from ${DIST_URL}'."
+      - "curl -fO ${DIST_URL}/${NAME_SRC}.tar.gz"
+      - "curl -fO ${DIST_URL}/${NAME_SRC}.tar.gz.sha256 | sha256sum -c"
 
       # Unpack the archives
-      - 'tar -xzf {{ user `NAME_BIN` }}.tar.gz'
-      - 'tar -xzf {{ user `NAME_SRC` }}.tar.gz'
+      - "tar -xzf ${NAME_BIN}.tar.gz"
+      - "tar -xzf ${NAME_SRC}.tar.gz"
 
       # Remove the archives
-      - 'rm -f {{ user `NAME_BIN` }}.tar.gz'
-      - 'rm -f {{ user `NAME_SRC` }}.tar.gz'
+      - "rm -f ${NAME_BIN}.tar.gz"
+      - "rm -f ${NAME_SRC}.tar.gz"
 
       # Move the binaries and sources to their expected positions
-      - 'mv {{ user `NAME_BIN` }}/ /rust'
-      - 'mv rustc-{{ user `CHANNEL` }}/ {{ user `DIR_LIBS` }}/src'
+      - "mv ${NAME_BIN}/ /rust"
+      - "mv rustc-${CHANNEL}/ ${DIR_LIBS}/src"
 
       # Run the installation script
-      - '/rust/install.sh --verbose'
-
-      # Put the cargo executable on the path
-      - 'chmod +x /rust/cargo'
-      - 'ln -s /rust/cargo /usr/local/bin/'
+      - "/rust/install.sh --verbose"
 
       # Clean up the build dependencies
-      - 'apk del .build-dependencies'
+      - "apk del .build-dependencies"
 
 post-processors:
   -
-    
-    # Tag the image with the specific rust version (if any)
-    - type: docker-tag
-      repository: aetheric/rust
-      tag: '{{ user `VERSION` }}'
     
     # Tag the image with the channel and overwrite
     - type: docker-tag
       repository: aetheric/rust
       tag: '{{ user `CHANNEL` }}'
-      force: true
-    
+ 
     # Push the image to the docker hub
-    - type: docker-push
+    #- type: docker-push
 
