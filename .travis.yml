@@ -16,7 +16,7 @@ env:
 
 before_install:
   - docker pull alpine:latest
-  - gem install glorious
+  - gem install gorgeous
   - chmod +x ./build.sh
 
 install:
