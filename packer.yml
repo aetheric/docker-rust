@@ -75,6 +75,7 @@ provisioners:
 
       # Run the installation script
       - "/rust/install.sh --verbose"
+      - "chmod +x /rust/cargo"
 
       # Clean up the build dependencies
       - "apk del .build-dependencies"

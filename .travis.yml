@@ -10,7 +10,8 @@ env:
     - secure: AtLYpCJExePAg5EkMnC+DdiI1t8iidlZYdb7dM/1eKdmZTP+VPMzh8PWLc3Mvq/dvYQ0ItuuGtQjGxWzoqROZelKrGpP+XcJk9aWa7YYJBj+cnWad17GwlEBudgAceIJZwfRw+5BxBaX+BA4cCWEoVJzhPE6qVMt8zhXzD/W47aPwL2UJfhvaqedJN4YJgls5OVPjDhWzWbOk/9PWNsqvFtWJUE+9RIEh3epLC/dfljPHG/3egig6AubWSUGYC4vkn90MoFo5r6KX8vAgho60FqW/avNh2LkPpzwLwqY/JBTopuC4mBBrkwtqgMymhbLym2QxqTt1BFUSDRNuRy8HweLFY2f2dCV5d34iWqcJ450MVu57hueGTeZQVieh50z+bya1qiYpQXTNGEBQHfM7Htf8gpmvF7FXeO6qOtvuaT/y0dmfJjZzoncYQDKCtyt63ILlNSSbtS9F8z6RhCREiNOM7qD30BhrVeWRsKxkdRtBVUUOGY26oISTVZo30oe5+Iwk8RJ9e6yKsi/5x5MsubR1iAhyA0Ij2KhY2fHMLAA0wBA+XXyDT6r7IeL7THtFcRF2bqk7W6BPTjJQdeGPdVBxQAUtlcM1yy9qOYIZjGHuL6KAvWndHZm0Iy24Dg/MhMifgP+vBz3y55CFskhQVmNTZ5IWW2Tuscbn+o2W9M=
 
   matrix:
-    - CHANNEL=stable
+    - allow_failures:
+      - CHANNEL=stable
     - CHANNEL=beta
     - CHANNEL=nightly
 
@@ -25,7 +26,8 @@ install:
 before_script:
   - docker login \
       --username ${DOCKER_USERNAME} \
-      --password ${DOCKER_PASSWORD}
+      --password ${DOCKER_PASSWORD} \
+      docker.io
 
 script:
   - docker push aetheric/rust:${CHANNEL}
