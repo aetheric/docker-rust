@@ -12,7 +12,8 @@ variables:
 
 builders:
   - type: docker
-    image: "alpine:{{ user `ALPINE` }}"
+    image: "frolvlad/alpine-glibc:{{ user `ALPINE` }}"
+    privileged: true
     commit: true
     run_command:
       - '-d'
@@ -23,7 +24,6 @@ builders:
 
 provisioners:
   - type: shell
-    #execute_command: "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     inline:
 
       # Setting up needed variables
@@ -50,7 +50,7 @@ provisioners:
           ca-certificates
           curl
           gcc"
-      
+
       # Download the rust binaries and verify them
       - "echo \"Attempting to download ${NAME_BIN} from ${DIST_URL}\"."
       - "curl -fO ${DIST_URL}/${NAME_BIN}.tar.gz"
@@ -61,7 +61,7 @@ provisioners:
       - "curl -fO ${DIST_URL}/${NAME_SRC}.tar.gz"
       - "curl -fO ${DIST_URL}/${NAME_SRC}.tar.gz.sha256 | sha256sum -c"
 
-      # Unpack the archives
+      # Unpack the archives`
       - "tar -xzf ${NAME_BIN}.tar.gz"
       - "tar -xzf ${NAME_SRC}.tar.gz"
 
@@ -73,21 +73,18 @@ provisioners:
       - "mv ${NAME_BIN}/ /rust"
       - "mv rustc-${CHANNEL}/ ${DIR_LIBS}/src"
 
-      # Run the installation script
+      # Run the installation script and compensate for alpine.
       - "/rust/install.sh --verbose"
-      - "chmod +x /rust/cargo"
+      - "ldconfig /"
+      
+      # Put cargo on the path
+      - "ln -s /rust/cargo/bin/cargo /usr/bin/cargo"
 
       # Clean up the build dependencies
       - "apk del .build-dependencies"
 
 post-processors:
-  -
-    
-    # Tag the image with the channel and overwrite
-    - type: docker-tag
-      repository: aetheric/rust
-      tag: '{{ user `CHANNEL` }}'
- 
-    # Push the image to the docker hub
-    #- type: docker-push
+  - type: docker-tag
+    repository: aetheric/rust
+    tag: '{{ user `CHANNEL` }}'
 
