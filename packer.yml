@@ -5,22 +5,16 @@ min_packer_version: 0.10.0
 variables:
 
   # The version of alpine linux to use
-  ALPINE: 'latest'
+  UBUNTU: 'latest'
 
   # This should be either stable, beta, or nightly
   CHANNEL: null
 
 builders:
   - type: docker
-    image: "frolvlad/alpine-glibc:{{ user `ALPINE` }}"
+    image: "mcandre/docker-ubuntu-slim:{{ user `UBUNTU` }}"
     privileged: true
     commit: true
-    run_command:
-      - '-d'
-      - '-i'
-      - '-t'
-      - '{{.Image}}'
-      - '/bin/sh'
 
 provisioners:
   - type: shell
@@ -46,7 +40,8 @@ provisioners:
       - "DIR_LIBS=\"/rust/${NAME_INT}/lib/rustlib/${NAME_SUFFIX}\""
 
       # Download all the development dependencies
-      - "apk --no-cache add --virtual .build-dependencies
+      - "apt-get update"
+      - "apt-get install -y
           ca-certificates
           curl
           gcc"
@@ -81,7 +76,7 @@ provisioners:
       - "ln -s /rust/cargo/bin/cargo /usr/bin/cargo"
 
       # Clean up the build dependencies
-      - "apk del .build-dependencies"
+      - "apt-get clean"
 
 post-processors:
   - type: docker-tag
