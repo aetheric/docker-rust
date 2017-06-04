@@ -18,7 +18,6 @@ env:
 before_install:
   - docker pull alpine:latest
   - gem install gorgeous
-  - chmod +x ./build.sh
 
 install:
   - docker build \
