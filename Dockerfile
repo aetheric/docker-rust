@@ -5,12 +5,12 @@ FROM alpine:latest
 
 # Install packages needed for build
 RUN apk --no-cache add --virtual .build-dependencies \
-		ca-certificates \
-		curl \
-		gcc
+	build-base \
+	ca-certificates \
+	curl
 
 # This should be either stable, beta, or nightly
-ARG RUST_CHANNEL
+ARG RUST_CHANNEL=nightly
 ARG RUST_VERSION=${RUST_CHANNEL}
 
 ARG RUST_DIST_URL=https://static.rust-lang.org/dist
@@ -19,26 +19,26 @@ ARG RUST_NAME_BIN=rust-${RUST_VERSION}-${RUST_NAME_SUFFIX}
 ARG RUST_NAME_SRC=rustc-${RUST_CHANNEL}-src
 ARG RUST_NAME_INT=rust-std-${RUST_NAME_SUFFIX}
 
-WORKDIR ~
+WORKDIR /usr/share/rust
 
 # Download, verify, unpack, remove,and position the channel.
-RUN pwd \
-	&& curl -fO ${RUST_DIST_URL}/${RUST_NAME_BIN}.tar.gz \
-	&& curl -fO ${RUST_DIST_URL}/${RUST_NAME_SRC}.tar.gz \
-	&& curl -fs ${RUST_DIST_URL}/${RUST_NAME_BIN}.tar.gz.sha256 | sha256sum -c - \
-	&& curl -fs ${RUST_DIST_URL}/${RUST_NAME_SRC}.tar.gz.sha256 | sha256sum -c - \
-	&& tar -xzf ${RUST_NAME_BIN}.tar.gz \
-	&& tar -xzf ${RUST_NAME_SRC}.tar.gz \
-	&& rm -f ${RUST_NAME_BIN}.tar.gz \
-	&& rm -f ${RUST_NAME_SRC}.tar.gz \
-	&& mv ${RUST_NAME_BIN}/ /rust \
-	&& mv rustc-${RUST_CHANNEL}/ /rust/${RUST_NAME_INT}/lib/rustlib/${RUST_NAME_SUFFIX}/src
+RUN curl -fO ${RUST_DIST_URL}/${RUST_NAME_BIN}.tar.gz \
+ && curl -fs ${RUST_DIST_URL}/${RUST_NAME_BIN}.tar.gz.sha256 | sha256sum -c \
+ && tar -xzf ${RUST_NAME_BIN}.tar.gz \
+ && rm -f ${RUST_NAME_BIN}.tar.gz \
+ && mv ${RUST_NAME_BIN}/ /rust
+
+# Sources too.
+RUN curl -fO ${RUST_DIST_URL}/${RUST_NAME_SRC}.tar.gz \
+ && curl -fs ${RUST_DIST_URL}/${RUST_NAME_SRC}.tar.gz.sha256 | sha256sum -c \
+ && tar -xzf ${RUST_NAME_SRC}.tar.gz \
+ && rm -f ${RUST_NAME_SRC}.tar.gz \
+ && mv rustc-${RUST_CHANNEL}-src/ /rust/${RUST_NAME_INT}/lib/rustlib/${RUST_NAME_SUFFIX}/src
 
 # Install the channel and put the binary on the path.
 RUN pwd \
 	&& /rust/install.sh --verbose \
-	&& chmod +x /rust/cargo \
-	&& ln -s /rust/cargo /usr/local/bin/
+	&& chmod +x /rust/cargo
 
 # clean up build dependencies
 RUN apk del .build-dependencies
@@ -48,8 +48,8 @@ WORKDIR /usr/work
 VOLUME /usr/work
 
 # Set the default commands.
-CMD [ "cargo", "build" ]
 ENTRYPOINT [ "cargo" ]
+CMD [ "build" ]
 
 # This container works when cargo is available
 HEALTHCHECK --interval=5m --timeout=3s \
