@@ -20,7 +20,7 @@ before_install:
   - gem install gorgeous
 
 install:
-  - docker build --build-arg "RUST_CHANNEL=${CHANNEL}" .
+  - docker build --build-arg "RUST_CHANNEL=${CHANNEL}" --tag aetheric/rust:${CHANNEL} .
 
 before_script:
   - docker login
