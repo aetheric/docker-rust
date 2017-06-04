@@ -20,8 +20,7 @@ before_install:
   - gem install gorgeous
 
 install:
-  - docker build \
-      --build-arg RUST_CHANNEL=${CHANNEL}
+  - docker build --build-arg "RUST_CHANNEL=${CHANNEL}" .
 
 before_script:
   - docker login
