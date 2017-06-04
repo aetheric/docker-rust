@@ -37,8 +37,8 @@ RUN curl -fO ${RUST_DIST_URL}/${RUST_NAME_SRC}.tar.gz \
 
 # Install the channel and put the binary on the path.
 RUN pwd \
-	&& /rust/install.sh --verbose \
-	&& chmod +x /rust/cargo
+ && /rust/install.sh --verbose \
+ && chmod +x /rust/cargo
 
 # clean up build dependencies
 RUN apk del .build-dependencies

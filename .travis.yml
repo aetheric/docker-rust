@@ -21,7 +21,8 @@ before_install:
   - chmod +x ./build.sh
 
 install:
-  - ./build.sh ${CHANNEL}
+  - docker build \
+      --build-arg RUST_CHANNEL=${CHANNEL}
 
 before_script:
   - docker login
